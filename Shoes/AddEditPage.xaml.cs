@@ -90,6 +90,30 @@ namespace Shoes
                 return;
             }
 
+
+
+
+            // Проверка на дублирование товара по названию и производителю
+            var duplicate = ValievaShoesEntities.GetContext().Product
+                .FirstOrDefault(p => p.ProductName == _currentProduct.ProductName
+                                  && p.ProductManufacturer == _currentProduct.ProductManufacturer
+                                  && p.ProductArticleNumber != _currentProduct.ProductArticleNumber);
+
+            if (duplicate != null)
+            {
+                MessageBox.Show("Товар с таким названием и производителем уже существует.",
+                                "Дубликат", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
+            // Если новый товар — добавляем в контекст
+            if (string.IsNullOrWhiteSpace(_currentProduct.ProductArticleNumber))
+            {
+                // Генерация артикля (например: P + timestamp)
+                _currentProduct.ProductArticleNumber = "P" + DateTime.Now.Ticks.ToString().Substring(8);
+                ValievaShoesEntities.GetContext().Product.Add(_currentProduct);
+            }
+
             // Сохраняем изображение в папку проекта, если пользователь выбрал новое
             if (!string.IsNullOrWhiteSpace(newImagePath))
             {
@@ -122,28 +146,6 @@ namespace Shoes
                 }
             }
 
-
-
-            // Проверка на дублирование товара по названию и производителю
-            var duplicate = ValievaShoesEntities.GetContext().Product
-                .FirstOrDefault(p => p.ProductName == _currentProduct.ProductName
-                                  && p.ProductManufacturer == _currentProduct.ProductManufacturer
-                                  && p.ProductArticleNumber != _currentProduct.ProductArticleNumber);
-
-            if (duplicate != null)
-            {
-                MessageBox.Show("Товар с таким названием и производителем уже существует.",
-                                "Дубликат", MessageBoxButton.OK, MessageBoxImage.Warning);
-                return;
-            }
-
-            // Если новый товар — добавляем в контекст
-            if (string.IsNullOrWhiteSpace(_currentProduct.ProductArticleNumber))
-            {
-                // Генерация артикля (например: P + timestamp)
-                _currentProduct.ProductArticleNumber = "P" + DateTime.Now.Ticks.ToString().Substring(8);
-                ValievaShoesEntities.GetContext().Product.Add(_currentProduct);
-            }
 
             // Сохраняем изменения
             try

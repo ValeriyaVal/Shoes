@@ -9,6 +9,7 @@
       Title="ProductPage" FontFamily="Times New Roman"
       IsVisibleChanged="Page_IsVisibleChanged">
 
+    
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="50"></RowDefinition>
@@ -158,7 +159,7 @@
 
                         <TextBlock Text="{Binding ProductDiscount, StringFormat={}{0}%}" FontSize="20" Grid.Column="2" Grid.RowSpan="7" HorizontalAlignment="Center" VerticalAlignment="Center"></TextBlock>
 
-                        <StackPanel Orientation="Horizontal" Grid.Row="3" Grid.RowSpan="4" Grid.Column="2" HorizontalAlignment="Center">
+                        <StackPanel Name="DelEdit" Orientation="Horizontal" Grid.Row="3" Grid.RowSpan="4" Grid.Column="2" HorizontalAlignment="Center">
                             <Button Name="EditBtn" Content="Редактировать" Click="EditBtn_Click"></Button>
                             <Button Name="DelBtn" Content="Удалить" Click="DelBtn_Click"></Button>
                         </StackPanel>
@@ -168,7 +169,7 @@
             </ListView.ItemTemplate>
         </ListView>
 
-        <Button Name="BntAdd" Content="Добавить" Click="BntAdd_Click" HorizontalAlignment="Right" VerticalAlignment="Bottom"></Button>
+        <Button Name="BntAdd" Content="Добавить" Click="BntAdd_Click" Grid.RowSpan="3" Margin="100"  HorizontalAlignment="Right" VerticalAlignment="Center"></Button>
         
     </Grid>
 </Page>

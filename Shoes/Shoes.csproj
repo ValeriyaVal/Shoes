@@ -188,19 +188,21 @@
     <Resource Include="Icon.JPG" />
     <Resource Include="Icon.png" />
     <Resource Include="picture.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
+  </ItemGroup>
+  <ItemGroup>
     <Content Include="ShoesModel.Context.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
-      <LastGenOutput>ShoesModel.Context.cs</LastGenOutput>
       <DependentUpon>ShoesModel.edmx</DependentUpon>
+      <LastGenOutput>ShoesModel.Context.cs</LastGenOutput>
     </Content>
     <Content Include="ShoesModel.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
       <DependentUpon>ShoesModel.edmx</DependentUpon>
       <LastGenOutput>ShoesModel.cs</LastGenOutput>
     </Content>
-  </ItemGroup>
-  <ItemGroup>
-    <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

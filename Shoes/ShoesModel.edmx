@@ -49,8 +49,8 @@
           <Property Name="ProductCategory" Type="nvarchar" MaxLength="50" Nullable="false" />
           <Property Name="ProductDiscount" Type="int" Nullable="false" />
           <Property Name="ProductQuantityInStock" Type="int" Nullable="false" />
-          <Property Name="ProductDescription" Type="varchar" MaxLength="100" Nullable="false" />
-          <Property Name="ProductPhoto" Type="varchar" MaxLength="50" />
+          <Property Name="ProductDescription" Type="varchar(max)" Nullable="false" />
+          <Property Name="ProductPhoto" Type="varchar(max)" />
         </EntityType>
         <EntityType Name="Role">
           <Key>
@@ -214,8 +214,8 @@
           <Property Name="ProductCategory" Type="String" MaxLength="50" FixedLength="false" Unicode="true" Nullable="false" />
           <Property Name="ProductDiscount" Type="Int32" Nullable="false" />
           <Property Name="ProductQuantityInStock" Type="Int32" Nullable="false" />
-          <Property Name="ProductDescription" Type="String" MaxLength="100" FixedLength="false" Unicode="false" Nullable="false" />
-          <Property Name="ProductPhoto" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="ProductDescription" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="ProductPhoto" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
           <NavigationProperty Name="OrderProduct" Relationship="Self.FK_OrderProduct_Product" FromRole="Product" ToRole="OrderProduct" />
         </EntityType>
         <EntityType Name="Role">

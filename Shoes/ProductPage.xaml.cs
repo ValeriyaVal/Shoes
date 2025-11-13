@@ -1,18 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
-
 
 namespace Shoes
 {
@@ -31,9 +22,11 @@ namespace Shoes
             ProductListView.ItemsSource = currentProducts;
 
             UpdateProducts();
+
+            // Если пользователь не авторизован (гость)
+           // BntAdd.Visibility = Visibility.Collapsed;
             Wrp.Visibility = Visibility.Hidden;
             WrpNoClient.Visibility = Visibility.Hidden;
-
         }
 
         public ProductPage(User user)
@@ -41,88 +34,176 @@ namespace Shoes
             InitializeComponent();
             _user = user;
 
-            FIOTB.Text = user.UserLastName + " " + user.UserFirstName + " " + user.UserPatronymic;
-            if (user.RoleID==1)
-                WrpNoClient.Visibility = Visibility.Hidden;
-            //switch (user.RoleID)
+            FIOTB.Text = $"{user.UserLastName} {user.UserFirstName} {user.UserPatronymic}";
+
+            ApplyRolePermissions();
+            UpdateProducts();
+        }
+
+        private void ApplyRolePermissions()
+        {
+            //if (_user == null || _user.RoleID == 1)
             //{
-            //    case 1:
-            //        //RoleTB.Text = "Авторизованный клиент"; 
-            //        WrpNoClient.Visibility = Visibility.Hidden; break;
-            //    case 2:
-            //        RoleTB.Text = "Менеджер"; break;
-            //    case 3:
-            //        RoleTB.Text = "Администратор"; break;
+            //    // Нет пользователя — скрываем добавление
+            //    BntAdd.Visibility = Visibility.Collapsed;
+            //    WrpNoClient.Visibility = Visibility.Hidden;
             //}
 
-            //ComboType.SelectedIndex = 0;
+            //// Кнопка "Добавить"
+            //BntAdd.Visibility = (_user.RoleID == 2) ? Visibility.Visible : Visibility.Collapsed;
 
+            //// Кнопки "Редактировать"/"Удалить" в ListView
+            //ProductListView.ItemContainerGenerator.StatusChanged += (s, e) =>
+            //{
+            //    if (ProductListView.ItemContainerGenerator.Status != System.Windows.Controls.Primitives.GeneratorStatus.ContainersGenerated)
+            //        return;
 
+            //    foreach (var item in ProductListView.Items)
+            //    {
+            //        var container = ProductListView.ItemContainerGenerator.ContainerFromItem(item) as ListViewItem;
+            //        if (container != null)
+            //        {
+            //            var delEditPanel = FindVisualChild<StackPanel>(container, "DelEdit");
+            //            if (delEditPanel != null)
+            //            {
+            //                delEditPanel.Visibility = (_user.RoleID == 2) ? Visibility.Visible : Visibility.Collapsed;
+            //            }
+            //        }
+            //    }
+            //};
+            if (_user == null || _user.RoleID == 1)
+            {
+                // Гость или обычный пользователь
+                BntAdd.Visibility = Visibility.Collapsed;
+                WrpNoClient.Visibility = Visibility.Collapsed; // Скрываем панель поиска/фильтров
+
+                // Скрываем кнопки редактирования/удаления
+                ProductListView.ItemContainerGenerator.StatusChanged += (s, e) =>
+                {
+                    if (ProductListView.ItemContainerGenerator.Status != System.Windows.Controls.Primitives.GeneratorStatus.ContainersGenerated)
+                        return;
+
+                    foreach (var item in ProductListView.Items)
+                    {
+                        var container = ProductListView.ItemContainerGenerator.ContainerFromItem(item) as ListViewItem;
+                        if (container != null)
+                        {
+                            var delEditPanel = FindVisualChild<StackPanel>(container, "DelEdit");
+                            if (delEditPanel != null)
+                                delEditPanel.Visibility = Visibility.Collapsed;
+                        }
+                    }
+                };
+            }
+            else if (_user.RoleID == 2)
+            {
+                // Администратор — всё доступно
+                BntAdd.Visibility = Visibility.Visible;
+                WrpNoClient.Visibility = Visibility.Visible;
+
+                ProductListView.ItemContainerGenerator.StatusChanged += (s, e) =>
+                {
+                    if (ProductListView.ItemContainerGenerator.Status != System.Windows.Controls.Primitives.GeneratorStatus.ContainersGenerated)
+                        return;
+
+                    foreach (var item in ProductListView.Items)
+                    {
+                        var container = ProductListView.ItemContainerGenerator.ContainerFromItem(item) as ListViewItem;
+                        if (container != null)
+                        {
+                            var delEditPanel = FindVisualChild<StackPanel>(container, "DelEdit");
+                            if (delEditPanel != null)
+                                delEditPanel.Visibility = Visibility.Visible;
+                        }
+                    }
+                };
+            }
+            else if (_user.RoleID == 3)
+            {
+                // Менеджер — фильтры видны, кнопки добавления и редактирования скрыты
+                BntAdd.Visibility = Visibility.Collapsed;
+                WrpNoClient.Visibility = Visibility.Visible;
+
+                ProductListView.ItemContainerGenerator.StatusChanged += (s, e) =>
+                {
+                    if (ProductListView.ItemContainerGenerator.Status != System.Windows.Controls.Primitives.GeneratorStatus.ContainersGenerated)
+                        return;
+
+                    foreach (var item in ProductListView.Items)
+                    {
+                        var container = ProductListView.ItemContainerGenerator.ContainerFromItem(item) as ListViewItem;
+                        if (container != null)
+                        {
+                            var delEditPanel = FindVisualChild<StackPanel>(container, "DelEdit");
+                            if (delEditPanel != null)
+                                delEditPanel.Visibility = Visibility.Collapsed;
+                        }
+                    }
+                };
+            }
         }
+
+        // Универсальный метод поиска визуального дочернего элемента по имени
+        private T FindVisualChild<T>(DependencyObject parent, string name) where T : FrameworkElement
+        {
+            if (parent == null) return null;
+
+            for (int i = 0; i < VisualTreeHelper.GetChildrenCount(parent); i++)
+            {
+                var child = VisualTreeHelper.GetChild(parent, i);
+                if (child is T tChild && tChild.Name == name)
+                    return tChild;
+
+                var result = FindVisualChild<T>(child, name);
+                if (result != null) return result;
+            }
+
+            return null;
+        }
+
         private void UpdateProducts()
         {
             var currentProducts = ValievaShoesEntities.GetContext().Product.ToList();
 
-            if (ComboType.SelectedIndex == 0 || ComboType.SelectedIndex < 0) { }
-            else if (ComboType.SelectedIndex == 1)
-                currentProducts = currentProducts.Where(p => p.ProductImporter== "Kari").ToList();
+            if (ComboType.SelectedIndex == 1)
+                currentProducts = currentProducts.Where(p => p.ProductImporter == "Kari").ToList();
             else if (ComboType.SelectedIndex == 2)
                 currentProducts = currentProducts.Where(p => p.ProductImporter == "Обувь для вас").ToList();
 
-            currentProducts = currentProducts.Where(p => p.ProductName.ToLower().Contains(TBoxSearch.Text.ToLower()) 
-            || p.ProductArticleNumber.ToLower().Contains(TBoxSearch.Text.ToLower()) 
-            || p.ProductManufacturer.ToLower().Contains(TBoxSearch.Text.ToLower()) 
-            || p.ProductImporter.ToLower().Contains(TBoxSearch.Text.ToLower())
-            || p.ProductCategory.ToLower().Contains(TBoxSearch.Text.ToLower())
-            || p.ProductDescription.ToLower().Contains(TBoxSearch.Text.ToLower())).ToList();
+            currentProducts = currentProducts.Where(p =>
+                p.ProductName.ToLower().Contains(TBoxSearch.Text.ToLower()) ||
+                p.ProductArticleNumber.ToLower().Contains(TBoxSearch.Text.ToLower()) ||
+                p.ProductManufacturer.ToLower().Contains(TBoxSearch.Text.ToLower()) ||
+                p.ProductImporter.ToLower().Contains(TBoxSearch.Text.ToLower()) ||
+                p.ProductCategory.ToLower().Contains(TBoxSearch.Text.ToLower()) ||
+                p.ProductDescription.ToLower().Contains(TBoxSearch.Text.ToLower())
+            ).ToList();
 
-
-            ProductListView.ItemsSource = currentProducts.ToList();
-
-            if (RBtnDown.IsChecked.Value)
-                currentProducts = currentProducts.OrderByDescending(p=>p.ProductQuantityInStock).ToList();
-            if (RBtnUp.IsChecked.Value)
+            if (RBtnDown.IsChecked == true)
+                currentProducts = currentProducts.OrderByDescending(p => p.ProductQuantityInStock).ToList();
+            if (RBtnUp.IsChecked == true)
                 currentProducts = currentProducts.OrderBy(p => p.ProductQuantityInStock).ToList();
 
             ProductListView.ItemsSource = currentProducts;
-            
-
         }
 
-
-
-        private void TBoxSearch_TextChanged(object sender, TextChangedEventArgs e)
-        {
-            UpdateProducts();
-        }
-
-        private void ComboType_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            UpdateProducts();
-        }
-
-        private void RBtnUp_Checked(object sender, RoutedEventArgs e)
-        {
-            UpdateProducts();
-        }
-
-        private void RBtnDown_Checked(object sender, RoutedEventArgs e)
-        {
-            UpdateProducts();
-        }
+        private void TBoxSearch_TextChanged(object sender, TextChangedEventArgs e) => UpdateProducts();
+        private void ComboType_SelectionChanged(object sender, SelectionChangedEventArgs e) => UpdateProducts();
+        private void RBtnUp_Checked(object sender, RoutedEventArgs e) => UpdateProducts();
+        private void RBtnDown_Checked(object sender, RoutedEventArgs e) => UpdateProducts();
 
         private void EditBtn_Click(object sender, RoutedEventArgs e)
         {
             var selectedProduct = (sender as Button).DataContext as Product;
             Manager.MainFrame.Navigate(new AddEditPage(selectedProduct));
-
         }
 
         private void DelBtn_Click(object sender, RoutedEventArgs e)
         {
             var currentProduct = (sender as Button).DataContext as Product;
 
-            var currentOrderProducts = ValievaShoesEntities.GetContext().OrderProduct.Where(op => op.ProductArticleNumber == currentProduct.ProductArticleNumber).ToList();
+            var currentOrderProducts = ValievaShoesEntities.GetContext().OrderProduct
+                .Where(op => op.ProductArticleNumber == currentProduct.ProductArticleNumber).ToList();
 
             if (currentOrderProducts.Count > 0)
             {
@@ -137,7 +218,6 @@ namespace Shoes
                 {
                     ValievaShoesEntities.GetContext().Product.Remove(currentProduct);
                     ValievaShoesEntities.GetContext().SaveChanges();
-
                     UpdateProducts();
                 }
                 catch (Exception ex)

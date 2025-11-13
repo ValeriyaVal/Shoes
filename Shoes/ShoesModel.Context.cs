@@ -15,6 +15,7 @@ namespace Shoes
     
     public partial class ValievaShoesEntities : DbContext
     {
+
         private static ValievaShoesEntities _context;
 
         public static ValievaShoesEntities GetContext()
