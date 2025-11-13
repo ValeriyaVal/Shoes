@@ -1,0 +1,33 @@
+﻿<Window x:Class="Shoes.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Shoes"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="450" Width="800"
+        FontFamily="Times New Roman" Icon="/picture/import/Icon.ico" >
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="60"></RowDefinition>
+            <RowDefinition ></RowDefinition>
+        </Grid.RowDefinitions>
+        <Grid Background="#7FFF00"></Grid>
+            
+        
+        <WrapPanel Orientation="Horizontal" Grid.Row="0" HorizontalAlignment="Center">
+            <Image Source="/picture/import/Icon.png" />
+            <TextBlock Text="Valieva Shoes" FontSize="40" HorizontalAlignment="Center" VerticalAlignment="Center" ></TextBlock>
+        </WrapPanel>
+        <Frame Grid.Row="1" Name="MainFrame" ContentRendered="MainFrame_ContentRendered" 
+               NavigationUIVisibility="Hidden"></Frame>
+        <Button Name="BtnBack"  Content="Назад" Click="BtnBack_Click" Grid.Row="1" 
+                VerticalAlignment="Bottom" HorizontalAlignment="Right" Margin="20"></Button>
+        
+        
+        
+        
+
+    </Grid>
+</Window>
