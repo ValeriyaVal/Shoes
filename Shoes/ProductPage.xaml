@@ -6,7 +6,8 @@
       xmlns:local="clr-namespace:Shoes"
       mc:Ignorable="d" 
       d:DesignHeight="450" d:DesignWidth="800"
-      Title="ProductPage" FontFamily="Times New Roman">
+      Title="ProductPage" FontFamily="Times New Roman"
+      IsVisibleChanged="Page_IsVisibleChanged">
 
     <Grid>
         <Grid.RowDefinitions>

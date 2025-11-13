@@ -1,9 +1,11 @@
-﻿using System;
+﻿using Microsoft.Win32;
+using System;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Media.Imaging;
 
 namespace Shoes
 {
@@ -13,6 +15,7 @@ namespace Shoes
         private Product _currentProduct = new Product();
         public AddEditPage() : this(null) { }
 
+        private string newImagePath = "";
         public AddEditPage(Product selectedProduct)
         {
             InitializeComponent();
@@ -87,6 +90,40 @@ namespace Shoes
                 return;
             }
 
+            // Сохраняем изображение в папку проекта, если пользователь выбрал новое
+            if (!string.IsNullOrWhiteSpace(newImagePath))
+            {
+                try
+                {
+                    string imagesFolder = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Images");
+                    if (!System.IO.Directory.Exists(imagesFolder))
+                    {
+                        System.IO.Directory.CreateDirectory(imagesFolder);
+                    }
+
+                    string fileName = System.IO.Path.GetFileName(newImagePath);
+                    string destPath = System.IO.Path.Combine(imagesFolder, fileName);
+
+                    // Если файл с таким именем уже есть, добавляем уникальный суффикс
+                    if (System.IO.File.Exists(destPath))
+                    {
+                        string nameWithoutExt = System.IO.Path.GetFileNameWithoutExtension(fileName);
+                        string ext = System.IO.Path.GetExtension(fileName);
+                        destPath = System.IO.Path.Combine(imagesFolder, nameWithoutExt + "_" + DateTime.Now.Ticks + ext);
+                    }
+
+                    System.IO.File.Copy(newImagePath, destPath);
+                    _currentProduct.ProductPhoto = destPath; // сохраняем путь в базу
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("Ошибка при сохранении изображения:\n" + ex.Message, "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                    return;
+                }
+            }
+
+
+
             // Проверка на дублирование товара по названию и производителю
             var duplicate = ValievaShoesEntities.GetContext().Product
                 .FirstOrDefault(p => p.ProductName == _currentProduct.ProductName
@@ -119,6 +156,42 @@ namespace Shoes
             {
                 MessageBox.Show("Ошибка при сохранении данных:\n" + ex.Message,
                                 "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        private void ChangePhotoBtn_Click(object sender, RoutedEventArgs e)
+        {
+            OpenFileDialog openFileDialog = new OpenFileDialog();
+            openFileDialog.Filter = "Image files (*.jpg; *.jpeg; *.png; *.bmp)|*.jpg; *.jpeg; *.png; *.bmp|All files (*.*)|*.*";
+            openFileDialog.FilterIndex = 1;
+
+            if (openFileDialog.ShowDialog() == true)
+            {
+                try
+                {
+                    //BitmapImage image = new BitmapImage(new Uri(openFileDialog.FileName));
+
+                    // Загружаем изображение для предпросмотра
+                    BitmapImage image = new BitmapImage();
+                    image.BeginInit();
+                    image.UriSource = new Uri(openFileDialog.FileName);
+                    image.CacheOption = BitmapCacheOption.OnLoad;
+                    image.EndInit();
+
+                    // Проверяем размер изображения
+                    if (image.PixelWidth > 300 || image.PixelHeight > 200)
+                    {
+                        MessageBox.Show("Размер изображения должен быть не более 300x200 пикселей. Изображение будет автоматически уменьшено.");
+                    }
+
+                    // Временно отображаем выбранное изображение
+                    PhotoImage.Source = new BitmapImage(new Uri(openFileDialog.FileName));
+                    newImagePath = openFileDialog.FileName;
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Ошибка при загрузке изображения: {ex.Message}");
+                }
             }
         }
     }

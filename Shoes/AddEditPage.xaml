@@ -11,7 +11,9 @@
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition ></ColumnDefinition>
-            <ColumnDefinition Width="200"></ColumnDefinition>
+            <ColumnDefinition ></ColumnDefinition>
+            <ColumnDefinition Width="300"></ColumnDefinition>
+
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
             <RowDefinition></RowDefinition>
@@ -80,6 +82,21 @@
         <StackPanel Orientation="Horizontal" Grid.Row="8"  VerticalAlignment="Center">
             <TextBlock Text="Действующая скидка: " Margin="5" FontSize="20"></TextBlock>
             <TextBox Text="{Binding ProductDiscount}" Width="200" Height="25" Margin="5" FontSize="20"></TextBox>
+        </StackPanel>
+
+        <StackPanel Orientation="Vertical" Grid.Row="0" Grid.RowSpan="9" Grid.Column="2" VerticalAlignment="Center">
+            <Image Name="PhotoImage" Margin="10" Width="200" Height="200">
+                <Image.Source>
+                    <Binding Path="ProductPhoto">
+                        <Binding.TargetNullValue>
+                            <ImageSource>
+                                picture.png
+                            </ImageSource>
+                        </Binding.TargetNullValue>
+                    </Binding>
+                </Image.Source>
+            </Image>
+            <Button Name="ChangePhotoBtn" Content="Выбрать фото" Click="ChangePhotoBtn_Click"></Button>
         </StackPanel>
 
         <Button Name="SaveBtn" Content="Сохранить" HorizontalAlignment="Center" Click="SaveBtn_Click" 

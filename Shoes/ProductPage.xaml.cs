@@ -120,12 +120,41 @@ namespace Shoes
 
         private void DelBtn_Click(object sender, RoutedEventArgs e)
         {
+            var currentProduct = (sender as Button).DataContext as Product;
 
+            var currentOrderProducts = ValievaShoesEntities.GetContext().OrderProduct.Where(op => op.ProductArticleNumber == currentProduct.ProductArticleNumber).ToList();
+
+            if (currentOrderProducts.Count > 0)
+            {
+                MessageBox.Show("Невозможно удалить запись о товаре, т.к. существуют записи о заказах с ним");
+                return;
+            }
+
+            if (MessageBox.Show("Вы точно хотите выполнить удаление?", "Внимание!",
+                MessageBoxButton.YesNo, MessageBoxImage.Warning) == MessageBoxResult.Yes)
+            {
+                try
+                {
+                    ValievaShoesEntities.GetContext().Product.Remove(currentProduct);
+                    ValievaShoesEntities.GetContext().SaveChanges();
+
+                    UpdateProducts();
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(ex.ToString());
+                }
+            }
         }
 
         private void BntAdd_Click(object sender, RoutedEventArgs e)
         {
             Manager.MainFrame.Navigate(new AddEditPage(null));
+        }
+
+        private void Page_IsVisibleChanged(object sender, DependencyPropertyChangedEventArgs e)
+        {
+            UpdateProducts();
         }
     }
 }
